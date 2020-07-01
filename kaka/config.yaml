@@ -1,0 +1,117 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: dev-kaka
+  labels:
+    type: development
+    name: kaka  
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-kaka
+  namespace: dev-kaka
+spec:
+  capacity:
+    storage: 5Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: pv-kaka
+  mountOptions:
+    - hard
+    - nfsvers=4.1
+  nfs:
+    path: /d/web/mykube
+    server: 172.17.0.1
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-kaka
+  namespace: dev-kaka
+spec:
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 5Gi
+  storageClassName: pv-kaka
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dep-kaka
+  namespace: dev-kaka
+  labels:
+    app: kaka
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kaka
+  template:
+    metadata:
+      labels:
+        app: kaka
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:1.14.2
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: kaka-storage
+              mountPath: /etc/nginx/conf.d
+              subPath: kaka/nginx.conf.d
+            - name: kaka-storage
+              mountPath: /web
+              subPath: kaka/web
+        - name: php-fpm
+          image: yuchanns/php-fpm:7.2
+          ports:
+            - containerPort: 9000
+          volumeMounts:
+            - name: kaka-storage
+              mountPath: /web
+              subPath: kaka/web
+        - name: mysql
+          image: mysql:5.7
+          ports:
+            - containerPort: 3306
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: "JoKwlar0JtOTZFL5"
+          volumeMounts:
+            - name: kaka-storage
+              mountPath: /var/lib/mysql
+              subPath: kaka/mysql
+        - name: redis
+          image: redis:5.0
+          ports:
+            - containerPort: 6379
+      volumes:
+        - name: kaka-storage
+          persistentVolumeClaim:
+            claimName: pvc-kaka
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kaka-service
+  namespace: dev-kaka
+spec:
+  type: NodePort
+  selector:
+    app: kaka
+  ports:
+    - name: nginx
+      protocol: TCP
+      port: 80
+      targetPort: 80
+    - name: mysql
+      protocol: TCP
+      port: 3306
+      targetPort: 3306
