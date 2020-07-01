@@ -23,8 +23,8 @@ The development environment for `LNMP`
   ```sh
   # install minikube according to https://kubernetes.io/zh/docs/setup/learning-environment/minikube/
   # then ssh into it and install nfs-common
-  sed -i 's/security.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list
-  sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list
+  sudo sed -i 's/security.ubuntu.com/mirrors.ustc.edu.cn/g' /etc/apt/sources.list
+  sudo sed -i 's/archive.ubuntu.com/mirrors.ustc.edu.cn/g' /etc/apt/sources.list
   sudo apt update && apt install nfs-common rpcbind
   ```
 
