@@ -57,6 +57,10 @@ spec:
       labels:
         app: kaka
     spec:
+      hostAliases:
+        - ip: "127.0.0.1"
+          hostnames:
+            - "t1088.ymf.test"
       containers:
         - name: nginx
           image: nginx:1.14.2
