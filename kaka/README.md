@@ -29,6 +29,7 @@ The development environment for `LNMP`
   ```
 
 ## Usage
+**Attention**: the folder mykube/kaka/mysql must be configured with `chown -R 999:999 mysql && chmod -R 777 mysql` otherwise the pod keeps sticking into `CrashLoopBackOff`.
 
 the usage is  work in progress.
 
