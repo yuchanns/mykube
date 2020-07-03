@@ -23,8 +23,8 @@ spec:
     - hard
     - nfsvers=4.1
   nfs:
-    path: /d/web/mykube
-    server: 172.17.0.1
+    path: /nfs-placeholder
+    server: host.minikube.internal
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
