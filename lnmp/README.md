@@ -36,4 +36,3 @@ the usage is  work in progress.
 ```sh
 kubectl create -f kaka/config.yaml
 ```
-
