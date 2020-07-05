@@ -1,16 +1,16 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: dev-kaka
+  name: dev-lnmp
   labels:
     type: development
-    name: kaka  
+    name: lnmp 
 ---
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: pv-kaka
-  namespace: dev-kaka
+  name: pv-lnmp
+  namespace: dev-lnmp
 spec:
   capacity:
     storage: 5Gi
@@ -18,19 +18,19 @@ spec:
   accessModes:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
-  storageClassName: pv-kaka
+  storageClassName: pv-lnmp
   mountOptions:
     - hard
-    - nfsvers=4.1
+    - nfsvers=3
   nfs:
-    path: /nfs-placeholder
+    path: /Users/yuchanns/Codes/mykube
     server: host.minikube.internal
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: pvc-kaka
-  namespace: dev-kaka
+  name: pvc-lnmp
+  namespace: dev-lnmp
 spec:
   accessModes:
     - ReadWriteOnce
@@ -38,24 +38,24 @@ spec:
   resources:
     requests:
       storage: 5Gi
-  storageClassName: pv-kaka
+  storageClassName: pv-lnmp
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: dep-kaka
-  namespace: dev-kaka
+  name: dep-lnmp
+  namespace: dev-lnmp
   labels:
-    app: kaka
+    app: lnmp
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: kaka
+      app: lnmp
   template:
     metadata:
       labels:
-        app: kaka
+        app: lnmp
     spec:
       hostAliases:
         - ip: "127.0.0.1"
@@ -67,20 +67,20 @@ spec:
           ports:
             - containerPort: 80
           volumeMounts:
-            - name: kaka-storage
+            - name: lnmp-storage
               mountPath: /etc/nginx/conf.d
-              subPath: kaka/nginx.conf.d
-            - name: kaka-storage
+              subPath: lnmp/nginx.conf.d
+            - name: lnmp-storage
               mountPath: /web
-              subPath: kaka/web
+              subPath: lnmp/web
         - name: php-fpm
           image: yuchanns/php-fpm:7.2
           ports:
             - containerPort: 9000
           volumeMounts:
-            - name: kaka-storage
+            - name: lnmp-storage
               mountPath: /web
-              subPath: kaka/web
+              subPath: lnmp/web
         - name: mysql
           image: mysql:5.7
           ports:
@@ -89,27 +89,27 @@ spec:
             - name: MYSQL_ROOT_PASSWORD
               value: "JoKwlar0JtOTZFL5"
           volumeMounts:
-            - name: kaka-storage
+            - name: lnmp-storage
               mountPath: /var/lib/mysql
-              subPath: kaka/mysql
+              subPath: lnmp/mysql
         - name: redis
           image: redis:5.0
           ports:
             - containerPort: 6379
       volumes:
-        - name: kaka-storage
+        - name: lnmp-storage
           persistentVolumeClaim:
-            claimName: pvc-kaka
+            claimName: pvc-lnmp
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: kaka-service
-  namespace: dev-kaka
+  name: lnmp-service
+  namespace: dev-lnmp
 spec:
   type: NodePort
   selector:
-    app: kaka
+    app: lnmp
   ports:
     - name: nginx
       protocol: TCP
